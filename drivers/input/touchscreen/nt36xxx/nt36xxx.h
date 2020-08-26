@@ -14,6 +14,7 @@
 #include <linux/i2c.h>
 #include <linux/input.h>
 #include <linux/uaccess.h>
+#include <linux/pm_qos.h>
 #include "nt36xxx_mem_map.h"
 #include <linux/regulator/consumer.h>
 #include <uapi/linux/sched/types.h>
@@ -143,6 +144,7 @@ struct nvt_ts_data {
 	uint8_t xbuf[1025];
 	struct mutex xbuf_lock;
 	bool irq_enabled;
+	struct pm_qos_request pm_qos_req;
 };
 
 typedef enum {

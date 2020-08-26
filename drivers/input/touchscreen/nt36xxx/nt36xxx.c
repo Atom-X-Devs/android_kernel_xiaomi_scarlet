@@ -490,6 +490,8 @@ static irqreturn_t nvt_ts_work_func(int irq, void *data)
 
 	sched_setscheduler(current, SCHED_FIFO, &param);
 
+	pm_qos_update_request(&ts->pm_qos_req, 100);
+
 #if WAKEUP_GESTURE
 	if (unlikely(bTouchIsAwake == 0)) {
 #if XIAOMI_PANEL
@@ -552,9 +554,10 @@ static irqreturn_t nvt_ts_work_func(int irq, void *data)
 	}
 
 	input_report_key(ts->input_dev, BTN_TOUCH, (finger_cnt > 0));
-	input_sync(ts->input_dev);
 
 XFER_ERROR:
+	pm_qos_update_request(&ts->pm_qos_req, PM_QOS_DEFAULT_VALUE);
+	input_sync(ts->input_dev);
 	mutex_unlock(&ts->lock);
 	return IRQ_HANDLED;
 }
@@ -821,6 +824,11 @@ static int32_t nvt_ts_probe(struct i2c_client *client,
 			goto err_int_request_failed;
 		else
 			nvt_irq_enable(false);
+
+		ts->pm_qos_req.type = PM_QOS_REQ_AFFINE_IRQ;
+		ts->pm_qos_req.irq = ts->client->irq;
+		pm_qos_add_request(&ts->pm_qos_req, PM_QOS_CPU_DMA_LATENCY,
+				PM_QOS_DEFAULT_VALUE);
 	}
 
 #if WAKEUP_GESTURE
@@ -897,6 +905,8 @@ err_gpio_config_failed:
 static int32_t nvt_ts_remove(struct i2c_client *client)
 {
 	fb_unregister_client(&ts->fb_notif);
+
+	pm_qos_remove_request(&ts->pm_qos_req);
 
 #if BOOT_UPDATE_FIRMWARE
 	if (nvt_fwu_wq) {
