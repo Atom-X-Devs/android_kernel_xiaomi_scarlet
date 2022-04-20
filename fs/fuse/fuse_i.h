@@ -356,8 +356,6 @@ struct fuse_req {
 	/** refcount */
 	refcount_t count;
 
-	bool user_pages;
-
 	/* Request flags, updated with test/set/clear_bit() */
 	unsigned long flags;
 
