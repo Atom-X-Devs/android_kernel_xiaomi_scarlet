@@ -614,7 +614,8 @@ struct kvm_hv_sint {
 
 struct kvm_xen_evtchn {
 	u32 port;
-	u32 vcpu;
+	u32 vcpu_id;
+	int vcpu_idx;
 	u32 priority;
 };
 
@@ -727,6 +728,7 @@ struct kvm {
 	 * and is accessed atomically.
 	 */
 	atomic_t online_vcpus;
+	int max_vcpus;
 	int created_vcpus;
 	int last_boosted_vcpu;
 	struct list_head vm_list;
@@ -1511,7 +1513,7 @@ static inline void kvm_arch_end_assignment(struct kvm *kvm)
 {
 }
 
-static inline bool kvm_arch_has_assigned_device(struct kvm *kvm)
+static __always_inline bool kvm_arch_has_assigned_device(struct kvm *kvm)
 {
 	return false;
 }

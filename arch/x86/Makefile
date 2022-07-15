@@ -21,6 +21,12 @@ ifdef CONFIG_CC_IS_CLANG
 RETPOLINE_CFLAGS	:= -mretpoline-external-thunk
 RETPOLINE_VDSO_CFLAGS	:= -mretpoline
 endif
+
+ifdef CONFIG_RETHUNK
+RETHUNK_CFLAGS		:= -mfunction-return=thunk-extern
+RETPOLINE_CFLAGS	+= $(RETHUNK_CFLAGS)
+endif
+
 export RETPOLINE_CFLAGS
 export RETPOLINE_VDSO_CFLAGS
 
@@ -274,8 +280,7 @@ $(BOOT_TARGETS): vmlinux
 
 PHONY += install
 install:
-	$(CONFIG_SHELL) $(srctree)/$(boot)/install.sh $(KERNELRELEASE) \
-		$(KBUILD_IMAGE) System.map "$(INSTALL_PATH)"
+	$(call cmd,install)
 
 PHONY += vdso_install
 vdso_install:
