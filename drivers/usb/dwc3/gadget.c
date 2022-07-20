@@ -3279,6 +3279,12 @@ static void dwc3_gadget_endpoint_transfer_in_progress(struct dwc3_ep *dep,
 
 	dwc3_gadget_ep_cleanup_completed_requests(dep, event, status);
 
+	if (usb_endpoint_xfer_isoc(dep->endpoint.desc) &&
+					(list_empty(&dep->started_list))) {
+		stop = true;
+		dbg_event(dep->number, "STOPXFER", dep->frame_number);
+	}
+
 	if (stop)
 		dwc3_stop_active_transfer(dwc, dep->number, true);
 	else if (dwc3_gadget_ep_should_continue(dep))
