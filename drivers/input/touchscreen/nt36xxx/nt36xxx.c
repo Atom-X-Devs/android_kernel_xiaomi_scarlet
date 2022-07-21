@@ -488,7 +488,7 @@ static irqreturn_t nvt_ts_work_func(int irq, void *data)
 	uint32_t input_y;
 	struct sched_param param = { .sched_priority = MAX_USER_RT_PRIO / 2 };
 
-	sched_setscheduler(current, SCHED_RR, &param);
+	sched_setscheduler(current, SCHED_FIFO, &param);
 
 #if WAKEUP_GESTURE
 	if (unlikely(bTouchIsAwake == 0)) {
