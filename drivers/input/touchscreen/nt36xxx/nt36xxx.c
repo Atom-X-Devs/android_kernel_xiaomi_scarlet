@@ -494,8 +494,9 @@ static irqreturn_t nvt_ts_work_func(int irq, void *data)
 	if (unlikely(bTouchIsAwake == 0)) {
 #if XIAOMI_PANEL
 		__pm_wakeup_event(gesture_wakelock, msecs_to_jiffies(5000));
-#endif
+#else
 		pm_wakeup_event(&ts->input_dev->dev, 5000);
+#endif
 	}
 #endif
 
